@@ -1,7 +1,7 @@
 # Fortify SSC Parser Plugin for Clair / REST API
 
 * Travis-CI builds: https://travis-ci.com/fortify-ps/fortify-ssc-parser-clair-rest
-* Binaries: https://bintray.com/beta/#/fortify-ps/binaries/fortify-ssc-parser-clair-rest?tab=files
+* Binaries (sort by Updated column to find latest): https://bintray.com/beta/#/fortify-ps/binaries/fortify-ssc-parser-clair-rest?tab=files
 * Sample JSON file: https://github.com/fortify-ps/fortify-ssc-parser-clair-rest/tree/1.0-SNAPSHOT/src/test/resources
 
 This Fortify SSC parser plugin allows for importing Clair scan results from JSON output produced by the Clair /v1/layers/{layerId}?features&vulnerabilities REST API call. See the following links for more information about Clair:
