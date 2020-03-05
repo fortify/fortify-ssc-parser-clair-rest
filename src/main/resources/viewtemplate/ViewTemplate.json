@@ -1,0 +1,90 @@
+[
+	[
+		{
+			"type": "template",
+			"title": "Feature",
+			"templateId": "TITLEBOX",
+			"items": [
+				{
+					"type": "template",
+					"title": "Namespace",
+					"key": "customAttributes.FeatureNamespaceName",
+					"templateId": "SIMPLE",
+					"dataType": "string"
+				},
+				{
+					"type": "template",
+					"title": "Name",
+					"key": "customAttributes.FeatureName",
+					"templateId": "SIMPLE",
+					"dataType": "string"
+				},
+				{
+					"type": "template",
+					"title": "Added By",
+					"key": "customAttributes.FeatureAddedBy",
+					"templateId": "SIMPLE",
+					"dataType": "string"
+				},
+				{
+					"type": "template",
+					"title": "Version Format",
+					"key": "customAttributes.FeatureVersionFormat",
+					"templateId": "SIMPLE",
+					"dataType": "string"
+				},
+				{
+					"type": "template",
+					"title": "Installed Version",
+					"key": "customAttributes.FeatureVersion",
+					"templateId": "SIMPLE",
+					"dataType": "string"
+				},
+				{
+					"type": "template",
+					"title": "Fixed in Version",
+					"key": "customAttributes.VulnerabilityFixedBy",
+					"templateId": "SIMPLE",
+					"dataType": "string"
+				}
+			]
+		}
+	],
+	[
+		{
+			"type": "template",
+			"title": "CVE",
+			"templateId": "TITLEBOX",
+			"items": [
+				{
+					"type": "template",
+					"title": "Name",
+					"key": "customAttributes.VulnerabilityName",
+					"templateId": "SIMPLE",
+					"dataType": "string"
+				},
+				{
+					"type": "template",
+					"title": "Severity",
+					"key": "customAttributes.VulnerabilitySeverity",
+					"templateId": "SIMPLE",
+					"dataType": "string"
+				},
+				{
+					"type": "template",
+					"title": "Link",
+					"key": "customAttributes.VulnerabilityLink",
+					"templateId": "SIMPLE",
+					"dataType": "string"
+				}
+			]
+		},
+		{
+			"type": "template",
+			"title": "Description",
+			"key": "brief",
+			"templateId": "COLLAPSE",
+			"dataType": "string"
+		}
+	]
+]
