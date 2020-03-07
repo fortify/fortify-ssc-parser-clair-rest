@@ -65,8 +65,6 @@ public class VulnerabilitiesParser {
 	}
 	
 	private final void buildVulnerability(Feature feature, Vulnerability vuln) {
-		System.out.println(feature.getName()+": "+vuln.getName());
-		
     	String cve = vuln.getName();
 		String uniqueId = DigestUtils.sha256Hex(cve);
 		CustomStaticVulnerabilityBuilder vb = vulnerabilityBuilder.startStaticVulnerability();
