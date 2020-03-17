@@ -39,6 +39,14 @@ echo $layerId
 # Get the features and vulnerabilities for this layer id (including all parent layers)
 curl -X GET "http://localhost:6060/v1/layers/$layerId?features&vulnerabilities" -o  node_10.14.2-jessie.clair.rest.json
 ```
+
+## IDE's
+
+This project uses Lombok. In order to have your IDE compile this project without errors, 
+you may need to add Lombok support to your IDE. Please see https://projectlombok.org/setup/overview 
+for more information.
+
+
 # Licensing
 
 See [LICENSE.TXT](LICENSE.TXT)
