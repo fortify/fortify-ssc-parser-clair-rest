@@ -39,3 +39,7 @@ echo $layerId
 # Get the features and vulnerabilities for this layer id (including all parent layers)
 curl -X GET "http://localhost:6060/v1/layers/$layerId?features&vulnerabilities" -o  node_10.14.2-jessie.clair.rest.json
 ```
+# Licensing
+
+See [LICENSE.TXT](LICENSE.TXT)
+
