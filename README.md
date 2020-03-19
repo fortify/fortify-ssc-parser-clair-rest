@@ -26,34 +26,34 @@ about how to install and use SSC parser plugins, please see the Fortify SSC docu
 
 ### Plugin Install & Upgrade
 
-1. Obtain the plugin binary jar file
+* Obtain the plugin binary jar file
   * Either download from Bintray (see [Related Links](#related-links)) 
   * Or by building yourself (see [Information for plugin developers](#information-for-plugin-developers))
-2. If you already have another version of the plugin installed, first uninstall the plugin by following the steps in [Plugin Uninstall](#plugin-uninstall)
-3. In Fortify Software Security Center:
-  1. Navigate to Administration->Plugins->Parsers
-  2. Click the `NEW` button
-  3. Accept the warning
-  4. Upload the plugin jar file
-  5. Enable the plugin by clicking the `ENABLE` button
+* If you already have another version of the plugin installed, first uninstall the plugin by following the steps in [Plugin Uninstall](#plugin-uninstall)
+* In Fortify Software Security Center:
+  * Navigate to Administration->Plugins->Parsers
+  * Click the `NEW` button
+  * Accept the warning
+  * Upload the plugin jar file
+  * Enable the plugin by clicking the `ENABLE` button
   
 ### Plugin Uninstall
 
 * In Fortify Software Security Center:
-  1. Navigate to Administration->Plugins->Parsers
-  2. Select the parser plugin that you want to uninstall
-  3. Click the `DISABLE` button
-  4. Click the `REMOVE` button 
+  * Navigate to Administration->Plugins->Parsers
+  * Select the parser plugin that you want to uninstall
+  * Click the `DISABLE` button
+  * Click the `REMOVE` button 
 
 ### Obtain results
 
-1. Have Clair perform a scan of your container image
+* Have Clair perform a scan of your container image
   * For example, using some Clair command line client like Yair
   * Or through container registry integration
-2. Determine the bottom layer id of the container image that was scanned
+* Determine the bottom layer id of the container image that was scanned
   * For example by inspecting the image manifest
-3. Invoke the Clair `/v1/layers/{layerId}?features&vulnerabilities` REST endpoint
-  * Replace `{layerId}` with the bottom layer id identified in step 2
+* Invoke the Clair `/v1/layers/{layerId}?features&vulnerabilities` REST endpoint
+  * Replace `{layerId}` with the bottom layer id identified in the previous step
   * Save the results in a file with the `.json` extension
   * See https://coreos.com/clair/docs/latest/api_v1.html#get-layersname for more information about this API endpoint
   * According to the documentation, this REST endpoint returns all vulnerabilities for both the given layer, and all upper layers
@@ -62,35 +62,35 @@ The following steps were used to generate the
 [src/test/resources/node_10.14.2-jessie.clair.rest.json](src/test/resources/node_10.14.2-jessie.clair.rest.json) 
 file:
 
-1. Use Yair to scan the `node:10.14.2-jessie` image
+* Use Yair to scan the `node:10.14.2-jessie` image
   * See https://github.com/fortify-ps/fortify-ssc-parser-clair-yair#obtain-results for an example on how to set-up Clair and run a scan with Yair
-2. Use the following command to determine the bottom layer id:  
+* Use the following command to determine the bottom layer id:  
   `layerId=$(docker manifest inspect -v node:10.14.2-jessie | jq -r '.[0]["SchemaV2Manifest"]["layers"][-1]["digest"]')`
   * This command requires Docker experimental mode to be enabled
   * Requires `jq` to be installed
   * Other images may require slightly different approach, depending on manifest version
   * Potentially there are better ways of obtaining this information
-3. Use the following command to invoke the Clair REST API endpoint and save the results:  
+* Use the following command to invoke the Clair REST API endpoint and save the results:  
   `curl -X GET "http://localhost:6060/v1/layers/${layerId}?features&vulnerabilities" -o  node_10.14.2-jessie.clair.rest.json`
 
 ### Upload results
 
 SSC web interface (manual upload):
 
-1. Navigate to the Artifacts tab of your application version
-2. Click the `UPLOAD` button
-3. Click the `ADD FILES` button, and select the JSON file to upload
-4. Enable the `3rd party results` check box
-5. Select the `CLAIR_REST_V1` type
+* Navigate to the Artifacts tab of your application version
+* Click the `UPLOAD` button
+* Click the `ADD FILES` button, and select the JSON file to upload
+* Enable the `3rd party results` check box
+* Select the `CLAIR_REST_V1` type
   
 SSC clients (FortifyClient, Maven plugin, ...):
 
-1. Generate a scan.info file containing a single line as follows:  
+* Generate a scan.info file containing a single line as follows:  
 `engineType=CLAIR_REST_V1`
-2. Generate a zip file containing the following:
-  * The scan.info file generated in step 1
+* Generate a zip file containing the following:
+  * The scan.info file generated in the previous step
   * The JSON file containing scan results
-3. Upload the zip file generated in step 2 to SSC
+* Upload the zip file generated in the previous step to SSC
   * Using any SSC client, for example FortifyClient
   * Similar to how you would upload an FPR file
 
