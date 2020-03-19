@@ -12,7 +12,7 @@ Clair 2.x `/v1/layers/{layerId}?features&vulnerabilities` REST API call. See the
 * **Automated builds**: https://travis-ci.com/fortify-ps/fortify-ssc-parser-clair-rest
 * **Binaries**: https://bintray.com/beta/#/fortify-ps/binaries/fortify-ssc-parser-clair-rest?tab=files  
   Sort by `Updated` column to find latest
-* **Sample input**: [src/test/resources/node_10.14.2-jessie.clair.rest.json](src/test/resources/node_10.14.2-jessie.clair.rest.json)
+* **Sample inputs**: [src/test/resources](src/test/resources)
 * **Clair resources**:
   * Clair GitHub repository: https://github.com/quay/clair/tree/v2.1.2
   * Legacy Clair documentation: https://coreos.com/clair/docs/latest/
