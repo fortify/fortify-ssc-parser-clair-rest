@@ -1,53 +1,161 @@
 # Fortify SSC Parser Plugin for Clair / REST API
 
-* Travis-CI builds: https://travis-ci.com/fortify-ps/fortify-ssc-parser-clair-rest
-* Binaries (sort by Updated column to find latest): https://bintray.com/beta/#/fortify-ps/binaries/fortify-ssc-parser-clair-rest?tab=files
-* Sample JSON file: https://github.com/fortify-ps/fortify-ssc-parser-clair-rest/tree/1.0-SNAPSHOT/src/test/resources
+This Fortify SSC parser plugin allows for importing scan results from Clair (Vulnerability Static Analysis for Containers).
 
-This Fortify SSC parser plugin allows for importing Clair scan results from JSON output produced by the Clair /v1/layers/{layerId}?features&vulnerabilities REST API call. See the following links for more information about Clair:
+Clair itself doesn't provide any file-based reports; as such this parser plugin parses files containing JSON produced by the
+Clair 2.x `/v1/layers/{layerId}?features&vulnerabilities` REST API call. See the [Usage](#Usage) section for more information.
 
-* Clair GitHub repository (latest 2.x version as supported by this plugin): https://github.com/quay/clair/tree/v2.1.2
-* Legacy Clair documentation: https://coreos.com/clair/docs/latest/ 
+### Related Links
 
-TODO: Provide further information and instructions
+* **Branches**: https://github.com/fortify-ps/fortify-ssc-parser-clair-rest/branches  
+  Current development is usually done on latest snapshot branch, which may not be the default branch
+* **Automated builds**: https://travis-ci.com/fortify-ps/fortify-ssc-parser-clair-rest
+* **Binaries**: https://bintray.com/beta/#/fortify-ps/binaries/fortify-ssc-parser-clair-rest?tab=files  
+  Sort by `Updated` column to find latest
+* **Sample input**: [src/test/resources/node_10.14.2-jessie.clair.rest.json](src/test/resources/node_10.14.2-jessie.clair.rest.json)
+* **Clair resources**:
+  * Clair GitHub repository: https://github.com/quay/clair/tree/v2.1.2
+  * Legacy Clair documentation: https://coreos.com/clair/docs/latest/
+* **Alternatives**:
+  * SSC Parser Plugin for Yair (Clair client): https://github.com/fortify-ps/fortify-ssc-parser-clair-yair
 
-TODO: Provide comparison between the various Clair-related parser plugins (fortify-ssc-parser-clair-rest, fortify-ssc-parser-clair-yair, ...)
+## Usage
 
-### Generate Clair JSON file
+The following sections describe how to install and use the plugin. For generic information
+about how to install and use SSC parser plugins, please see the Fortify SSC documentation.
 
-The following steps were used to generate the `src/test/resources/node_10.14.2-jessie.clair.rest.json` file:
+### Plugin Install & Upgrade
 
-```bash
+1. Obtain the plugin binary jar file
+  * Either download from Bintray (see [Related Links](#related-links)) 
+  * Or by building yourself (see [Information for plugin developers](#information-for-plugin-developers))
+2. If you already have another version of the plugin installed, first uninstall the plugin by following the steps in [Plugin Uninstall](#plugin-uninstall)
+3. In Fortify Software Security Center:
+  1. Navigate to Administration->Plugins->Parsers
+  2. Click the `NEW` button
+  3. Accept the warning
+  4. Upload the plugin jar file
+  5. Enable the plugin by clicking the `ENABLE` button
+  
+### Plugin Uninstall
 
-# See instructions for fortify-ssc-parser-clair-yair to:
-# - Set up Clair
-# - Run a scan for the node:10.14.2-jessie image using Yair
+* In Fortify Software Security Center:
+  1. Navigate to Administration->Plugins->Parsers
+  2. Select the parser plugin that you want to uninstall
+  3. Click the `DISABLE` button
+  4. Click the `REMOVE` button 
 
-# Once a scan has been run for the node:10.14.2-jessie image (using either 
-# Yair or any other means), follow the instructions below to retrieve the
-# JSON contents that can be parsed by fortify-ssc-parser-clair-rest
+### Obtain results
+
+1. Have Clair perform a scan of your container image
+  * For example, using some Clair command line client like Yair
+  * Or through container registry integration
+2. Determine the bottom layer id of the container image that was scanned
+  * For example by inspecting the image manifest
+3. Invoke the Clair `/v1/layers/{layerId}?features&vulnerabilities` REST endpoint
+  * Replace `{layerId}` with the bottom layer id identified in step 2
+  * Save the results in a file with the `.json` extension
+  * See https://coreos.com/clair/docs/latest/api_v1.html#get-layersname for more information about this API endpoint
+  * According to the documentation, this REST endpoint returns all vulnerabilities for both the given layer, and all upper layers
+    
+The following steps were used to generate the 
+[src/test/resources/node_10.14.2-jessie.clair.rest.json](src/test/resources/node_10.14.2-jessie.clair.rest.json) 
+file:
+
+1. Use Yair to scan the `node:10.14.2-jessie` image
+  * See https://github.com/fortify-ps/fortify-ssc-parser-clair-yair#obtain-results for an example on how to set-up Clair and run a scan with Yair
+2. Use the following command to determine the bottom layer id:  
+  `layerId=$(docker manifest inspect -v node:10.14.2-jessie | jq -r '.[0]["SchemaV2Manifest"]["layers"][-1]["digest"]')`
+  * This command requires Docker experimental mode to be enabled
+  * Requires `jq` to be installed
+  * Other images may require slightly different approach, depending on manifest version
+  * Potentially there are better ways of obtaining this information
+3. Use the following command to invoke the Clair REST API endpoint and save the results:  
+  `curl -X GET "http://localhost:6060/v1/layers/${layerId}?features&vulnerabilities" -o  node_10.14.2-jessie.clair.rest.json`
+
+### Upload results
+
+SSC web interface (manual upload):
+
+1. Navigate to the Artifacts tab of your application version
+2. Click the `UPLOAD` button
+3. Click the `ADD FILES` button, and select the JSON file to upload
+4. Enable the `3rd party results` check box
+5. Select the `CLAIR_REST_V1` type
+  
+SSC clients (FortifyClient, Maven plugin, ...):
+
+1. Generate a scan.info file containing a single line as follows:  
+`engineType=CLAIR_REST_V1`
+2. Generate a zip file containing the following:
+  * The scan.info file generated in step 1
+  * The JSON file containing scan results
+3. Upload the zip file generated in step 2 to SSC
+  * Using any SSC client, for example FortifyClient
+  * Similar to how you would upload an FPR file
 
 
-# Find the bottom layer id of the image that was scanned by Yair
-# - 'docker manifest inspect' requires Docker experimental mode to be enabled
-# - Requires jq to be installed
-# - Other images may require slightly different approach (depending on manifest version)
-# - Any better way of doing this?
-layerId=`docker manifest inspect -v node:10.14.2-jessie | jq -r '.[0]["SchemaV2Manifest"]["layers"][-1]["digest"]'`
-echo $layerId
 
-# Get the features and vulnerabilities for this layer id (including all parent layers)
-curl -X GET "http://localhost:6060/v1/layers/$layerId?features&vulnerabilities" -o  node_10.14.2-jessie.clair.rest.json
-```
+## Information for plugin developers
 
-## IDE's
+The following sections provide information that may be useful for developers of this 
+parser plugin.
+
+### IDE's
 
 This project uses Lombok. In order to have your IDE compile this project without errors, 
 you may need to add Lombok support to your IDE. Please see https://projectlombok.org/setup/overview 
 for more information.
 
+### Gradle
+
+It is strongly recommended to build this project using the included Gradle Wrapper
+scripts; using other Gradle versions may result in build errors and other issues.
+
+The Gradle build uses various helper scripts from https://github.com/fortify-ps/gradle-helpers;
+please refer to the documentation and comments in included scripts for more information. 
+
+### Commonly used commands
+
+All commands listed below use Linux/bash notation; adjust accordingly if you
+are running on a different platform. All commands are to be executed from
+the main project directory.
+
+* `./gradlew tasks --all`: List all available tasks
+* Build: (plugin binary will be stored in `build/libs`)
+  * `./gradlew clean build`: Clean and build the project
+  * `./gradlew build`: Build the project without cleaning
+* Version management:
+  * `./gradlew printProjectVersion`: Print the current version
+  * `./gradlew startSnapshotBranch -PnextVersion=2.0`: Start a new snapshot branch for an upcoming `2.0` version
+  * `./gradlew releaseSnapshot`: Merge the changes from the current branch to the master branch, and create release tag
+* `./fortify-scan.sh`: Run a Fortify scan; requires Fortify SCA to be installed
+
+Note that the version management tasks operate only on the local repository; you will need to manually
+push any changes (including tags and branches) to the remote repository.
+
+### Versioning
+
+The various version-related Gradle tasks assume the following versioning methodology:
+* The `master` branch is only used for creating tagged release versions
+* A branch named `<version>-SNAPSHOT` contains the current snapshot state for the upcoming release
+* Optionally, other branches can be used to develop individual features, perform bug fixes, ...
+  * However, note that the Gradle build may be unable to identify a correct version number for the project
+  * As such, only builds from tagged versions or from a `<version>-SNAPSHOT` branch should be published to a Maven repository
+
+### Automated Builds & publishing
+
+Travis-CI builds are automatically triggered when there is any change in the project repository,
+for example due to pushing changes, or creating tags or branches. If applicable, binaries and related 
+artifacts are automatically published to Bintray using the `bintrayUpload` task:
+
+* Building a tagged version will result in corresponding release version artifacts to be published
+* Building a branch named `<version>-SNAPSHOT` will result in corresponding beta version artifacts to be published
+* No artifacts will be deployed for any other build, for example when Travis-CI builds the `master` branch
+
+See the [Related Links](#related-links) section for the relevant Travis-CI and Bintray links.
+
 
 # Licensing
-
 See [LICENSE.TXT](LICENSE.TXT)
 
