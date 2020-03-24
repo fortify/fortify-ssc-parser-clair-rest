@@ -9,15 +9,15 @@ Clair 2.x `/v1/layers/{layerId}?features&vulnerabilities` REST API call. See the
 
 * **Downloads**:  
   _Beta versions may be unstable or non-functional. The `*-licenseReport.zip` and `*-dependencySources.zip` files are for informational purposes only and do not need to be downloaded._
-  * **Release versions**: https://bintray.com/package/files/fortify-ps/binaries/fortify-ssc-parser-clair-rest-release?order=desc&sort=fileLastModified&basePath=&tab=files  
-  * **Beta versions**: https://bintray.com/package/files/fortify-ps/binaries/fortify-ssc-parser-clair-rest-beta?order=desc&sort=fileLastModified&basePath=&tab=files
-  * **Sample input files**: [src/test/resources](src/test/resources)
+	* **Release versions**: https://bintray.com/package/files/fortify-ps/binaries/fortify-ssc-parser-clair-rest-release?order=desc&sort=fileLastModified&basePath=&tab=files  
+	* **Beta versions**: https://bintray.com/package/files/fortify-ps/binaries/fortify-ssc-parser-clair-rest-beta?order=desc&sort=fileLastModified&basePath=&tab=files
+	* **Sample input files**: [src/test/resources](src/test/resources)
 * **Automated builds**: https://travis-ci.com/fortify-ps/fortify-ssc-parser-clair-rest
 * **Clair resources**:
-  * Clair GitHub repository: https://github.com/quay/clair/tree/v2.1.2
-  * Legacy Clair documentation: https://coreos.com/clair/docs/latest/
+	* Clair GitHub repository: https://github.com/quay/clair/tree/v2.1.2
+	* Legacy Clair documentation: https://coreos.com/clair/docs/latest/
 * **Alternatives**:
-  * SSC Parser Plugin for Yair (Clair client): https://github.com/fortify-ps/fortify-ssc-parser-clair-yair
+	* SSC Parser Plugin for Yair (Clair client): https://github.com/fortify-ps/fortify-ssc-parser-clair-yair
 
 ## Usage
 
@@ -27,49 +27,49 @@ about how to install and use SSC parser plugins, please see the Fortify SSC docu
 ### Plugin Install & Upgrade
 
 * Obtain the plugin binary jar file
-  * Either download from Bintray (see [Related Links](#related-links)) 
-  * Or by building yourself (see [Information for plugin developers](#information-for-plugin-developers))
+	* Either download from Bintray (see [Related Links](#related-links)) 
+	* Or by building yourself (see [Information for plugin developers](#information-for-plugin-developers))
 * If you already have another version of the plugin installed, first uninstall the plugin by following the steps in [Plugin Uninstall](#plugin-uninstall)
 * In Fortify Software Security Center:
-  * Navigate to Administration->Plugins->Parsers
-  * Click the `NEW` button
-  * Accept the warning
-  * Upload the plugin jar file
-  * Enable the plugin by clicking the `ENABLE` button
+	* Navigate to Administration->Plugins->Parsers
+	* Click the `NEW` button
+	* Accept the warning
+	* Upload the plugin jar file
+	* Enable the plugin by clicking the `ENABLE` button
   
 ### Plugin Uninstall
 
 * In Fortify Software Security Center:
-  * Navigate to Administration->Plugins->Parsers
-  * Select the parser plugin that you want to uninstall
-  * Click the `DISABLE` button
-  * Click the `REMOVE` button 
+	* Navigate to Administration->Plugins->Parsers
+	* Select the parser plugin that you want to uninstall
+	* Click the `DISABLE` button
+	* Click the `REMOVE` button 
 
 ### Obtain results
 
 * Have Clair perform a scan of your container image
-  * For example, using some Clair command line client like Yair
-  * Or through container registry integration
+	* For example, using some Clair command line client like Yair
+	* Or through container registry integration
 * Determine the bottom layer id of the container image that was scanned
-  * For example by inspecting the image manifest
+	* For example by inspecting the image manifest
 * Invoke the Clair `/v1/layers/{layerId}?features&vulnerabilities` REST endpoint
-  * Replace `{layerId}` with the bottom layer id identified in the previous step
-  * Save the results in a file with the `.json` extension
-  * See https://coreos.com/clair/docs/latest/api_v1.html#get-layersname for more information about this API endpoint
-  * According to the documentation, this REST endpoint returns all vulnerabilities for both the given layer, and all upper layers
+	* Replace `{layerId}` with the bottom layer id identified in the previous step
+	* Save the results in a file with the `.json` extension
+	* See https://coreos.com/clair/docs/latest/api_v1.html#get-layersname for more information about this API endpoint
+	* According to the documentation, this REST endpoint returns all vulnerabilities for both the given layer, and all upper layers
     
 The following steps were used to generate the 
 [src/test/resources/node_10.14.2-jessie.clair.rest.json](src/test/resources/node_10.14.2-jessie.clair.rest.json) 
 file:
 
 * Use Yair to scan the `node:10.14.2-jessie` image
-  * See https://github.com/fortify-ps/fortify-ssc-parser-clair-yair#obtain-results for an example on how to set-up Clair and run a scan with Yair
+	* See https://github.com/fortify-ps/fortify-ssc-parser-clair-yair#obtain-results for an example on how to set-up Clair and run a scan with Yair
 * Use the following command to determine the bottom layer id:  
   `layerId=$(docker manifest inspect -v node:10.14.2-jessie | jq -r '.[0]["SchemaV2Manifest"]["layers"][-1]["digest"]')`
-  * This command requires Docker experimental mode to be enabled
-  * Requires `jq` to be installed
-  * Other images may require slightly different approach, depending on manifest version
-  * Potentially there are better ways of obtaining this information
+	* This command requires Docker experimental mode to be enabled
+	* Requires `jq` to be installed
+	* Other images may require slightly different approach, depending on manifest version
+	* Potentially there are better ways of obtaining this information
 * Use the following command to invoke the Clair REST API endpoint and save the results:  
   `curl -X GET "http://localhost:6060/v1/layers/${layerId}?features&vulnerabilities" -o  node_10.14.2-jessie.clair.rest.json`
 
@@ -88,11 +88,11 @@ SSC clients (FortifyClient, Maven plugin, ...):
 * Generate a scan.info file containing a single line as follows:  
 `engineType=CLAIR_REST_V1`
 * Generate a zip file containing the following:
-  * The scan.info file generated in the previous step
-  * The JSON file containing scan results
+	* The scan.info file generated in the previous step
+	* The JSON file containing scan results
 * Upload the zip file generated in the previous step to SSC
-  * Using any SSC client, for example FortifyClient
-  * Similar to how you would upload an FPR file
+	* Using any SSC client, for example FortifyClient
+	* Similar to how you would upload an FPR file
 
 
 
@@ -123,13 +123,13 @@ the main project directory.
 
 * `./gradlew tasks --all`: List all available tasks
 * Build: (plugin binary will be stored in `build/libs`)
-  * `./gradlew clean build`: Clean and build the project
-  * `./gradlew build`: Build the project without cleaning
-  * `./gradlew dist`: Build distribution zip
+	* `./gradlew clean build`: Clean and build the project
+	* `./gradlew build`: Build the project without cleaning
+	* `./gradlew dist`: Build distribution zip
 * Version management:
-  * `./gradlew printProjectVersion`: Print the current version
-  * `./gradlew startSnapshotBranch -PnextVersion=2.0`: Start a new snapshot branch for an upcoming `2.0` version
-  * `./gradlew releaseSnapshot`: Merge the changes from the current branch to the master branch, and create release tag
+	* `./gradlew printProjectVersion`: Print the current version
+	* `./gradlew startSnapshotBranch -PnextVersion=2.0`: Start a new snapshot branch for an upcoming `2.0` version
+	* `./gradlew releaseSnapshot`: Merge the changes from the current branch to the master branch, and create release tag
 * `./fortify-scan.sh`: Run a Fortify scan; requires Fortify SCA to be installed
 
 Note that the version management tasks operate only on the local repository; you will need to manually
@@ -142,8 +142,8 @@ The various version-related Gradle tasks assume the following versioning methodo
 * The `master` branch is only used for creating tagged release versions
 * A branch named `<version>-SNAPSHOT` contains the current snapshot state for the upcoming release
 * Optionally, other branches can be used to develop individual features, perform bug fixes, ...
-  * However, note that the Gradle build may be unable to identify a correct version number for the project
-  * As such, only builds from tagged versions or from a `<version>-SNAPSHOT` branch should be published to a Maven repository
+	* However, note that the Gradle build may be unable to identify a correct version number for the project
+	* As such, only builds from tagged versions or from a `<version>-SNAPSHOT` branch should be published to a Maven repository
 
 ### Automated Builds & publishing
 
