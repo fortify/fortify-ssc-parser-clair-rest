@@ -12,7 +12,6 @@ import com.fortify.plugin.api.VulnerabilityHandler;
 import com.fortify.plugin.spi.ParserPlugin;
 import com.fortify.ssc.parser.clair.rest.v1.parser.ScanParser;
 import com.fortify.ssc.parser.clair.rest.v1.parser.VulnerabilitiesParser;
-import com.fortify.util.ssc.parser.VulnerabilityBuilder;
 
 public class ClairRestV1ParserPlugin implements ParserPlugin<CustomVulnAttribute> {
     private static final Logger LOG = LoggerFactory.getLogger(ClairRestV1ParserPlugin.class);
@@ -39,6 +38,6 @@ public class ClairRestV1ParserPlugin implements ParserPlugin<CustomVulnAttribute
 
 	@Override
 	public void parseVulnerabilities(final ScanData scanData, final VulnerabilityHandler vulnerabilityHandler) throws ScanParsingException, IOException {
-		new VulnerabilitiesParser(scanData, new VulnerabilityBuilder(vulnerabilityHandler)).parse();
+		new VulnerabilitiesParser(scanData, vulnerabilityHandler).parse();
 	}
 }

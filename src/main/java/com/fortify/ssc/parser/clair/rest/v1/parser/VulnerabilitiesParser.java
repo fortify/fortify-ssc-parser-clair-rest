@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonToken;
 import com.fortify.plugin.api.BasicVulnerabilityBuilder.Priority;
@@ -12,14 +13,15 @@ import com.fortify.plugin.api.FortifyAnalyser;
 import com.fortify.plugin.api.FortifyKingdom;
 import com.fortify.plugin.api.ScanData;
 import com.fortify.plugin.api.ScanParsingException;
+import com.fortify.plugin.api.StaticVulnerabilityBuilder;
+import com.fortify.plugin.api.VulnerabilityHandler;
 import com.fortify.ssc.parser.clair.rest.v1.CustomVulnAttribute;
 import com.fortify.ssc.parser.clair.rest.v1.domain.Feature;
 import com.fortify.ssc.parser.clair.rest.v1.domain.FeatureWithVulnerabilities;
 import com.fortify.ssc.parser.clair.rest.v1.domain.Vulnerability;
 import com.fortify.util.ssc.parser.EngineTypeHelper;
+import com.fortify.util.ssc.parser.HandleDuplicateIdVulnerabilityHandler;
 import com.fortify.util.ssc.parser.ScanDataStreamingJsonParser;
-import com.fortify.util.ssc.parser.VulnerabilityBuilder;
-import com.fortify.util.ssc.parser.VulnerabilityBuilder.CustomStaticVulnerabilityBuilder;
 
 public class VulnerabilitiesParser {
 	private static final String ENGINE_TYPE = EngineTypeHelper.getEngineType();
@@ -35,16 +37,15 @@ public class VulnerabilitiesParser {
 	}};
 	
 	private final ScanData scanData;
-	private final VulnerabilityBuilder vulnerabilityBuilder;
+	private final VulnerabilityHandler vulnerabilityHandler;
 
-    public VulnerabilitiesParser(final ScanData scanData, final VulnerabilityBuilder vulnerabilityBuilder) {
+    public VulnerabilitiesParser(final ScanData scanData, final VulnerabilityHandler vulnerabilityHandler) {
     	this.scanData = scanData;
-		this.vulnerabilityBuilder = vulnerabilityBuilder;
+		this.vulnerabilityHandler = new HandleDuplicateIdVulnerabilityHandler(vulnerabilityHandler);
 	}
     
     /**
-	 * Main method to commence parsing the SARIF document provided by the
-	 * configured {@link ScanData}.
+	 * Main method to commence parsing the input provided by the configured {@link ScanData}.
 	 * @throws ScanParsingException
 	 * @throws IOException
 	 */
@@ -55,22 +56,37 @@ public class VulnerabilitiesParser {
 			.parse(scanData);
 	}
 	
+	/**
+	 * Call the {@link #buildVulnerabilityIfValid(Feature, Vulnerability)} for each 
+	 * {@link Vulnerability} contained in the given {@link FeatureWithVulnerabilities}
+	 * instance (if any).
+	 */
 	private final void buildVulnerabilitiesForFeature(FeatureWithVulnerabilities feature) {
 		Vulnerability[] vulnerabilities = feature.getVulnerabilities();
 		if ( vulnerabilities!=null && vulnerabilities.length>0 ) {
 			for ( Vulnerability vulnerability : vulnerabilities ) {
-				buildVulnerability(feature, vulnerability);
+				buildVulnerabilityIfValid(feature, vulnerability);
 			}
 		}
 	}
 	
+	/**
+	 * Call the {@link #buildVulnerability(Feature, Vulnerability)} method if the 
+	 * given {@link Vulnerability} provides valid vulnerability data.
+	 * @param finding
+	 */
+	private void buildVulnerabilityIfValid(Feature feature, Vulnerability vuln) {
+		if ( StringUtils.isNotBlank(vuln.getName()) ) {
+			buildVulnerability(feature, vuln);
+		}
+	}
+
+	/**
+	 * Build the vulnerability from the given {@link Feature} and {@link Vulnerability}, 
+	 * using the configured {@link VulnerabilityHandler}.
+	 */
 	private final void buildVulnerability(Feature feature, Vulnerability vuln) {
-    	String cve = vuln.getName();
-		String uniqueId = DigestUtils.sha256Hex(cve);
-		CustomStaticVulnerabilityBuilder vb = vulnerabilityBuilder.startStaticVulnerability();
-		// TODO For now we let CustomStaticVulnerabilityBuilder handle duplicate id's
-		//      We should check whether there's a better way to generate unique id
-		vb.setInstanceId(uniqueId);
+		StaticVulnerabilityBuilder vb = vulnerabilityHandler.startStaticVulnerability(getInstanceId(feature, vuln));
 		
 		// Set meta-data
 		vb.setEngineType(ENGINE_TYPE);
@@ -103,4 +119,14 @@ public class VulnerabilitiesParser {
 		vb.completeVulnerability();
 		
     }
+
+	/**
+	 * Calculate the issue instance id, using a combination of feature name, feature version, and vulnerability name
+	 */
+	private final String getInstanceId(Feature feature, Vulnerability vuln) {
+		String featureName = StringUtils.defaultString(feature.getName(), "x");
+		String featureVersion = StringUtils.defaultString(feature.getVersion(), "x");
+		String vulnName = vuln.getName();
+		return DigestUtils.sha256Hex(String.join("|", featureName, featureVersion, vulnName));
+	}
 }
