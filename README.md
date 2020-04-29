@@ -1,11 +1,37 @@
+<x-tag-head>
+<x-tag-meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+
+<x-tag-script language="JavaScript"><!--
+<X-INCLUDE url="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.0.0/build/highlight.min.js"/>
+--></x-tag-script>
+
+<x-tag-script language="JavaScript"><!--
+<X-INCLUDE url="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" />
+--></x-tag-script>
+
+<x-tag-script language="JavaScript"><!--
+<X-INCLUDE url="${gradleHelpersLocation}/spa_readme.js" />
+--></x-tag-script>
+
+<x-tag-style><!--
+<X-INCLUDE url="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.0.0/build/styles/github.min.css" />
+--></x-tag-style>
+
+<x-tag-style><!--
+<X-INCLUDE url="${gradleHelpersLocation}/spa_readme.css" />
+--></x-tag-style>
+</x-tag-head>
+
 # Fortify SSC Parser Plugin for Clair / REST API
+
+## Introduction
 
 This Fortify SSC parser plugin allows for importing scan results from Clair (Vulnerability Static Analysis for Containers).
 
 Clair itself doesn't provide any file-based reports; as such this parser plugin parses files containing JSON produced by the
 Clair 2.x `/v1/layers/{layerId}?features&vulnerabilities` REST API call. See the [Usage](#Usage) section for more information.
 
-### <a name="related-links">Related Links</a>
+### Related Links
 
 * **Downloads**:  
   _Beta versions may be unstable or non-functional. The `*-licenseReport.zip` and `*-dependencySources.zip` files are for informational purposes only and do not need to be downloaded._
@@ -20,17 +46,17 @@ Clair 2.x `/v1/layers/{layerId}?features&vulnerabilities` REST API call. See the
 * **Alternatives**:
 	* SSC Parser Plugin for Yair (Clair client): https://github.com/fortify-ps/fortify-ssc-parser-clair-yair
 
-## <a name="Usage">Usage</a>
+## Plugin Installation
 
-The following sections describe how to install and use the plugin. For generic information
-about how to install and use SSC parser plugins, please see the Fortify SSC documentation.
+These sections describe how to install, upgrade and uninstall the plugin.
 
-### <a name="plugin-install--upgrade">Plugin Install & Upgrade</a>
+### Install & Upgrade
 
 * Obtain the plugin binary jar file
 	* Either download from Bintray (see [Related Links](#related-links)) 
-	* Or by building yourself (see [Information for plugin developers](#information-for-plugin-developers))
-* If you already have another version of the plugin installed, first uninstall the plugin by following the steps in [Plugin Uninstall](#plugin-uninstall)
+	* Or by building yourself (see [Developers](#developers))
+* If you already have another version of the plugin installed, first uninstall the previously 
+ installed version of the plugin by following the steps under [Uninstall](#uninstall) below
 * In Fortify Software Security Center:
 	* Navigate to Administration->Plugins->Parsers
 	* Click the `NEW` button
@@ -38,7 +64,7 @@ about how to install and use SSC parser plugins, please see the Fortify SSC docu
 	* Upload the plugin jar file
 	* Enable the plugin by clicking the `ENABLE` button
   
-### <a name="plugin-uninstall">Plugin Uninstall</a>
+### Uninstall
 
 * In Fortify Software Security Center:
 	* Navigate to Administration->Plugins->Parsers
@@ -46,7 +72,8 @@ about how to install and use SSC parser plugins, please see the Fortify SSC docu
 	* Click the `DISABLE` button
 	* Click the `REMOVE` button 
 
-### <a name="obtain-results">Obtain results</a>
+
+## Obtain results
 
 * Have Clair perform a scan of your container image
 	* For example, using some Clair command line client like Yair
@@ -60,7 +87,7 @@ about how to install and use SSC parser plugins, please see the Fortify SSC docu
 	* According to the documentation, this REST endpoint returns all vulnerabilities for both the given layer, and all upper layers
     
 The following steps were used to generate the 
-[src/test/resources/node_10.14.2-jessie.clair.rest.json](src/test/resources/node_10.14.2-jessie.clair.rest.json) 
+[sampleData/node_10.14.2-jessie.clair.rest.json](sampleData/node_10.14.2-jessie.clair.rest.json) 
 file:
 
 * Use Yair to scan the `node:10.14.2-jessie` image
@@ -74,7 +101,7 @@ file:
 * Use the following command to invoke the Clair REST API endpoint and save the results:  
   `curl -X GET "http://localhost:6060/v1/layers/${layerId}?features&vulnerabilities" -o  node_10.14.2-jessie.clair.rest.json`
 
-### <a name="upload-results">Upload results</a>
+## Upload results
 
 SSC web interface (manual upload):
 
@@ -97,18 +124,18 @@ SSC clients (FortifyClient, Maven plugin, ...):
 
 
 
-## <a name="information-for-plugin-developers">Information for plugin developers</a>
+## Developers
 
 The following sections provide information that may be useful for developers of this 
 parser plugin.
 
-### <a name="ides">IDE's</a>
+### IDE's
 
 This project uses Lombok. In order to have your IDE compile this project without errors, 
 you may need to add Lombok support to your IDE. Please see https://projectlombok.org/setup/overview 
 for more information.
 
-### <a name="gradle">Gradle</a>
+### Gradle Wrapper
 
 It is strongly recommended to build this project using the included Gradle Wrapper
 scripts; using other Gradle versions may result in build errors and other issues.
@@ -116,7 +143,7 @@ scripts; using other Gradle versions may result in build errors and other issues
 The Gradle build uses various helper scripts from https://github.com/fortify-ps/gradle-helpers;
 please refer to the documentation and comments in included scripts for more information. 
 
-### <a name="commonly-used-commands">Commonly used commands</a>
+### Common Commands
 
 All commands listed below use Linux/bash notation; adjust accordingly if you
 are running on a different platform. All commands are to be executed from
@@ -136,7 +163,7 @@ the main project directory.
 Note that the version management tasks operate only on the local repository; you will need to manually
 push any changes (including tags and branches) to the remote repository.
 
-### <a name="versioning">Versioning</a>
+### Versioning
 
 The various version-related Gradle tasks assume the following versioning methodology:
 
@@ -146,7 +173,7 @@ The various version-related Gradle tasks assume the following versioning methodo
 	* However, note that the Gradle build may be unable to identify a correct version number for the project
 	* As such, only builds from tagged versions or from a `<version>-SNAPSHOT` branch should be published to a Maven repository
 
-### <a name="automated-builds--publishing">Automated Builds & publishing</a>
+### CI/CD
 
 Travis-CI builds are automatically triggered when there is any change in the project repository,
 for example due to pushing changes, or creating tags or branches. If applicable, binaries and related 
@@ -159,6 +186,11 @@ artifacts are automatically published to Bintray using the `bintrayUpload` task:
 See the [Related Links](#related-links) section for the relevant Travis-CI and Bintray links.
 
 
-# <a name="licensing">Licensing</a>
+## License
+<x-insert text="<!--"/>
+
 See [LICENSE.TXT](LICENSE.TXT)
 
+<x-insert text="-->"/>
+
+<x-include url="file:LICENSE.TXT"/>
