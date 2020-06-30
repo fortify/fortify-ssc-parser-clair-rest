@@ -41,7 +41,6 @@ import com.fortify.plugin.api.ScanData;
 import com.fortify.plugin.api.ScanEntry;
 import com.fortify.plugin.api.StaticVulnerabilityBuilder;
 import com.fortify.plugin.api.VulnerabilityHandler;
-import com.fortify.ssc.parser.clair.rest.v1.ClairRestV1ParserPlugin;
 
 class ClairRestV1ParserPluginTest {
 	private static final String TEST_RESOURCE_NAME = "node_10.14.2-jessie.clair.rest.json";

@@ -21,7 +21,7 @@ import com.fortify.ssc.parser.clair.rest.v1.domain.FeatureWithVulnerabilities;
 import com.fortify.ssc.parser.clair.rest.v1.domain.Vulnerability;
 import com.fortify.util.ssc.parser.EngineTypeHelper;
 import com.fortify.util.ssc.parser.HandleDuplicateIdVulnerabilityHandler;
-import com.fortify.util.ssc.parser.ScanDataStreamingJsonParser;
+import com.fortify.util.ssc.parser.json.ScanDataStreamingJsonParser;
 
 public class VulnerabilitiesParser {
 	private static final String ENGINE_TYPE = EngineTypeHelper.getEngineType();

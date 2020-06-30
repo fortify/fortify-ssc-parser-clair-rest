@@ -6,7 +6,7 @@ import java.util.Date;
 import com.fortify.plugin.api.ScanBuilder;
 import com.fortify.plugin.api.ScanData;
 import com.fortify.plugin.api.ScanParsingException;
-import com.fortify.util.ssc.parser.ScanDataStreamingJsonParser;
+import com.fortify.util.ssc.parser.json.ScanDataStreamingJsonParser;
 
 public class ScanParser {
 	private final ScanData scanData;
