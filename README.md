@@ -24,6 +24,7 @@ Clair 2.x `/v1/layers/{layerId}?features&vulnerabilities` REST API call
 
 <!-- START-INCLUDE:repo-resources.md -->
 
+* **Usage**: [USAGE.md](USAGE.md)
 * **Releases**: https://github.com/fortify/fortify-ssc-parser-clair-rest/releases
     * _Development releases may be unstable or non-functional. The `*-thirdparty.zip` file is for informational purposes only and does not need to be downloaded._
 * **Sample input files**: [sampleData](sampleData)
