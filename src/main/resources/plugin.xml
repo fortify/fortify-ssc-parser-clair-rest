@@ -6,7 +6,7 @@
         <name>Clair - REST JSON parser plugin</name>
         <version><!--VERSION-->0.0<!--/VERSION--></version>
         <data-version>1</data-version>
-        <vendor name="Micro Focus" url="https://www.microfocus.com"/>
+        <vendor name="Open Text" url="https://opentext.com"/>
         <description><![CDATA[Parser plugin for JSON output produced by the Clair /v1/layers/{layerId}?features&vulnerabilities REST API call]]></description>
         <resources>
             <localization>
